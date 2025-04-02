@@ -1,337 +1,566 @@
+import React, { useRef, useEffect, useState } from "react";
+
 import {
   View,
   Text,
-  TouchableOpacity,
   Image,
   StyleSheet,
-  StatusBar,
-} from "react-native";
-import React, { useRef, useState } from "react";
-import { RootStackScreenProps } from "../navigators/RootNavigator";
-import {
+  TouchableOpacity,
+  ScrollView,
+  Animated,
+  Dimensions,
+  Platform,
   SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
-import { useTheme } from "@react-navigation/native";
-import Icons from "@expo/vector-icons/MaterialIcons";
-// import { StatusBar } from "expo-status-bar";
-import BottomSheet from "@gorhom/bottom-sheet";
+} from "react-native";
+import { BlurView } from "expo-blur";
+import { Ionicons, AntDesign, FontAwesome } from "@expo/vector-icons";
 
-const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "3XL"];
+// Types
+type Size = "S" | "M" | "L" | "XXL";
+type Tab = "Descriptions" | "Reviews" | "Sold";
 
-const DetailsScreen = ({
-  navigation,
-  route: {
-    params: { id },
-  },
-}: RootStackScreenProps<"Details">) => {
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
-  const [count, setCount] = useState(1);
-  const [size, setSize] = useState(SIZES[0]);
+interface Review {
+  id: string;
+  name: string;
+  avatar: string;
+  rating: number;
+  text: string;
+}
+
+const { width } = Dimensions.get("window");
+
+const DetailsScreen: React.FC = () => {
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+
+  // State
+  const [selectedSize, setSelectedSize] = useState<Size>("M");
+  const [activeTab, setActiveTab] = useState<Tab>("Descriptions");
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
+
+  // Sample reviews data
+  const reviews: Review[] = [
+    {
+      id: "1",
+      name: "Monkey D Daffa",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      rating: 4.9,
+      text: "A budget-friendly jacket that is great item for any formal occasion or daily wear. They are durable, comfortable and will last for a long time if properly cared for.",
+    },
+    {
+      id: "2",
+      name: "Gold D Rijal",
+      avatar: "https://randomuser.me/api/portraits/men/41.jpg",
+      rating: 4.8,
+      text: "Perfect quality jacket that is comfortable for daily use. I love it!",
+    },
+  ];
+
+  // Run animations on component mount
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  // Toggle favorite with animation
+  const toggleFavorite = () => {
+    const newValue = !isFavorite;
+    setIsFavorite(newValue);
+
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.2,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  // Render size option
+  const renderSizeOption = (size: Size) => {
+    const isSelected = selectedSize === size;
+
+    return (
+      <TouchableOpacity
+        key={size}
+        style={[styles.sizeOption, isSelected && styles.selectedSizeOption]}
+        onPress={() => setSelectedSize(size)}
+      >
+        <Text style={[styles.sizeText, isSelected && styles.selectedSizeText]}>
+          {size}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  // Render tab
+  const renderTab = (tab: Tab, count?: number) => {
+    const isActive = activeTab === tab;
+    const tabText = count ? `${tab}(${count})` : tab;
+
+    return (
+      <TouchableOpacity
+        style={[styles.tab, isActive && styles.activeTab]}
+        onPress={() => setActiveTab(tab)}
+      >
+        <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+          {tabText}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  // Render stars for rating
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating - fullStars >= 0.5;
+
+    return (
+      <View style={styles.starsContainer}>
+        {[...Array(5)].map((_, i) => {
+          if (i < fullStars) {
+            return (
+              <FontAwesome key={i} name="star" size={14} color="#FFD700" />
+            );
+          } else if (i === fullStars && hasHalfStar) {
+            return (
+              <FontAwesome
+                key={i}
+                name="star-half-o"
+                size={14}
+                color="#FFD700"
+              />
+            );
+          } else {
+            return (
+              <FontAwesome key={i} name="star-o" size={14} color="#FFD700" />
+            );
+          }
+        })}
+        <Text style={styles.ratingText}>{rating}</Text>
+      </View>
+    );
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor="white" barStyle="dark-content" />
+    <SafeAreaView style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        {/* <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Product Detail</Text>
+          <TouchableOpacity style={styles.shareButton}>
+            <Ionicons name="share-outline" size={24} color="#000" />
+          </TouchableOpacity>
+        </View> */}
 
-      <View style={{ flex: 1 }}>
-        <Image
-          source={{
-            uri: "https://images.unsplash.com/photo-1571945153237-4929e783af4a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
-          }}
-          style={{ flex: 1 }}
-        />
-
-        <SafeAreaView
-          edges={["top"]}
-          style={{ position: "absolute", top: 0, left: 0, right: 0 }}
-        >
-          <StatusBar style="light" />
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              padding: 20,
-              gap: 8,
+        {/* Product Image with Blur */}
+        <View style={styles.imageContainer}>
+          <BlurView intensity={60} style={styles.blurBackground} tint="light" />
+          <Animated.Image
+            source={{
+              uri: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1036&q=80",
             }}
-          >
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{
-                width: 52,
-                aspectRatio: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 52,
-                borderWidth: 1,
-                borderColor: "#fff",
-              }}
-            >
-              <Icons name="arrow-back" size={24} color={"#fff"} />
-            </TouchableOpacity>
-            <View style={{ flex: 1 }} />
-            <TouchableOpacity
-              style={{
-                width: 52,
-                aspectRatio: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 52,
-                borderWidth: 1,
-                borderColor: "#fff",
-              }}
-            >
-              <Icons name="favorite-border" size={24} color={"#fff"} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                width: 52,
-                aspectRatio: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 52,
-                borderWidth: 1,
-                borderColor: "#fff",
-              }}
-            >
-              <Icons name="add-shopping-cart" size={24} color={"#fff"} />
+            style={[
+              styles.productImage,
+              {
+                opacity: fadeAnim,
+                transform: [{ scale: scaleAnim }],
+              },
+            ]}
+            resizeMode="contain"
+          />
+
+          {/* Image Pagination Dots */}
+          <View style={styles.paginationDots}>
+            <View style={styles.activeDot} />
+            <View style={styles.dot} />
+            <View style={styles.dot} />
+          </View>
+        </View>
+
+        {/* Product Info */}
+        <Animated.View
+          style={[
+            styles.productInfo,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          <View style={styles.titleRow}>
+            <Text style={styles.productTitle}>Retirement Thug Jacket</Text>
+            <TouchableOpacity onPress={toggleFavorite}>
+              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <AntDesign
+                  name={isFavorite ? "heart" : "hearto"}
+                  size={24}
+                  color={isFavorite ? "#FF3B30" : "#000"}
+                />
+              </Animated.View>
             </TouchableOpacity>
           </View>
-        </SafeAreaView>
 
-        <BottomSheet
-          detached
-          snapPoints={[64, 500]}
-          index={0}
-          style={{ marginHorizontal: 20 }}
-          bottomInset={insets.bottom + 20}
-          backgroundStyle={{
-            borderRadius: 24,
-            backgroundColor: colors.background,
-          }}
-          handleIndicatorStyle={{
-            backgroundColor: colors.primary,
-          }}
-        >
-          <View style={{ padding: 16, gap: 16, flex: 1 }}>
-            <Text
-              style={{ fontSize: 20, fontWeight: "600", color: colors.text }}
-            >
-              PUMA Everyday Hussle
-            </Text>
+          <Text style={styles.price}>IDR 700,000</Text>
 
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-            >
-              <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: "row", gap: 2 }}>
-                  {new Array(5).fill("").map((_, i) => (
-                    <Icons
-                      key={i}
-                      name={i < 3 ? "star" : "star-border"}
-                      color="#facc15"
-                      size={20}
-                    />
-                  ))}
-                </View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: colors.text,
-                    opacity: 0.5,
-                    marginTop: 4,
-                  }}
-                >
-                  3.0 (250K Reviews)
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                  backgroundColor: colors.primary,
-                  padding: 6,
-                  borderRadius: 100,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => setCount((count) => Math.max(1, count - 1))}
-                  style={{
-                    backgroundColor: colors.card,
-                    width: 34,
-                    aspectRatio: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 34,
-                  }}
-                >
-                  <Icons name="remove" size={20} color={colors.text} />
-                </TouchableOpacity>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "600",
-                    color: colors.background,
-                  }}
-                >
-                  {count}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setCount((count) => Math.min(10, count + 1))}
-                  style={{
-                    backgroundColor: colors.card,
-                    width: 34,
-                    aspectRatio: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 34,
-                  }}
-                >
-                  <Icons name="add" size={20} color={colors.text} />
-                </TouchableOpacity>
-              </View>
+          {/* Size Selection */}
+          <View style={styles.sizeContainer}>
+            <Text style={styles.sizeLabel}>Size</Text>
+            <View style={styles.sizeOptions}>
+              {(["S", "M", "L", "XXL"] as Size[]).map(renderSizeOption)}
             </View>
+          </View>
 
-            <View>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text
-                  style={{
-                    flex: 1,
-                    fontSize: 16,
-                    fontWeight: "600",
-                    color: colors.text,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  Model is 6'1'', Size M
-                </Text>
-                <Text style={{ color: colors.text, opacity: 0.5 }}>
-                  Size guide
-                </Text>
-              </View>
+          {/* Tabs */}
+          <View style={styles.tabsContainer}>
+            {renderTab("Descriptions")}
+            {renderTab("Reviews", 503)}
+            {renderTab("Sold", 559)}
+          </View>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 6,
-                  marginTop: 6,
-                }}
-              >
-                {SIZES.map((s, i) => (
-                  <TouchableOpacity
-                    key={i}
-                    onPress={() => setSize(s)}
-                    style={{
-                      width: 44,
-                      height: 44,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor:
-                        s === size ? colors.primary : colors.card,
-                      borderRadius: 44,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: s === size ? colors.card : colors.text,
-                        fontWeight: "600",
-                        fontSize: 16,
-                      }}
-                    >
-                      {s}
-                    </Text>
-                  </TouchableOpacity>
+          {/* Tab Content */}
+          <View style={styles.tabContent}>
+            {activeTab === "Descriptions" && (
+              <Text style={styles.descriptionText}>
+                Premium quality jacket made with durable materials. Perfect for
+                casual and formal occasions.
+              </Text>
+            )}
+
+            {activeTab === "Reviews" && (
+              <View style={styles.reviewsContainer}>
+                {reviews.map((review) => (
+                  <View key={review.id} style={styles.reviewItem}>
+                    <View style={styles.reviewHeader}>
+                      <Image
+                        source={{ uri: review.avatar }}
+                        style={styles.reviewerAvatar}
+                      />
+                      <View style={styles.reviewerInfo}>
+                        <Text style={styles.reviewerName}>{review.name}</Text>
+                        {renderStars(review.rating)}
+                      </View>
+                    </View>
+                    <Text style={styles.reviewText}>{review.text}</Text>
+                  </View>
                 ))}
               </View>
-            </View>
+            )}
 
-            <View>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  marginBottom: 6,
-                  color: colors.text,
-                }}
-              >
-                Description
-              </Text>
-              <Text
-                style={{ color: colors.text, opacity: 0.75 }}
-                numberOfLines={3}
-              >
-                Aute magna dolore sint ipsum dolor fugiat. Ad magna ad elit
-                labore culpa sunt sint laboris consectetur sunt. Lorem excepteur
-                occaecat reprehenderit nostrud culpa ad ex exercitation tempor.
-              </Text>
-            </View>
-
-            <View style={{ flex: 1 }} />
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
-            >
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{ color: colors.text, opacity: 0.75, marginBottom: 4 }}
-                >
-                  Total
-                </Text>
-                <Text
-                  style={{
-                    color: colors.text,
-                    fontSize: 18,
-                    fontWeight: "600",
-                  }}
-                >
-                  ${(25000).toLocaleString()}
+            {activeTab === "Sold" && (
+              <View style={styles.soldContainer}>
+                <Text style={styles.soldText}>
+                  559 items sold in the last month
                 </Text>
               </View>
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: colors.primary,
-                  height: 64,
-                  borderRadius: 64,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  position: "relative",
-                  flexDirection: "row",
-                  padding: 12,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "600",
-                    color: colors.background,
-                    paddingHorizontal: 16,
-                  }}
-                >
-                  Add to cart
-                </Text>
-
-                <View
-                  style={{
-                    backgroundColor: colors.card,
-                    width: 40,
-                    aspectRatio: 1,
-                    borderRadius: 40,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Icons name="arrow-forward" size={24} color={colors.text} />
-                </View>
-              </TouchableOpacity>
-            </View>
+            )}
           </View>
-        </BottomSheet>
-      </View>
+        </Animated.View>
+      </ScrollView>
+
+      {/* Buy Now Button */}
+      <Animated.View
+        style={[
+          styles.buyButtonContainer,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        <TouchableOpacity
+          style={styles.checkboxContainer}
+          onPress={() => setIsChecked(!isChecked)}
+        >
+          <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
+            {isChecked && <Ionicons name="checkmark" size={16} color="#FFF" />}
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.buyButton}>
+          <Text style={styles.buyButtonText}>Buy Now</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+
+    backgroundColor: "#F8F8F8",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "#FFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  shareButton: {
+    padding: 8,
+  },
+  imageContainer: {
+    width: "100%",
+    height: 350,
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF",
+  },
+  blurBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  productImage: {
+    width: "80%",
+    height: "80%",
+  },
+  paginationDots: {
+    flexDirection: "row",
+    position: "absolute",
+    bottom: 16,
+    alignSelf: "center",
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#D8D8D8",
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    width: 16,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#4CD964",
+    marginHorizontal: 4,
+  },
+  productInfo: {
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -20,
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    paddingBottom: 100,
+  },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  productTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  price: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#000",
+    marginBottom: 16,
+  },
+  sizeContainer: {
+    marginVertical: 16,
+  },
+  sizeLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  sizeOptions: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+  },
+  sizeOption: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  selectedSizeOption: {
+    backgroundColor: "#4CD964",
+    borderColor: "#4CD964",
+  },
+  sizeText: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  selectedSizeText: {
+    color: "#FFF",
+  },
+  tabsContainer: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+    marginBottom: 16,
+  },
+  tab: {
+    paddingVertical: 12,
+    marginRight: 24,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#4CD964",
+  },
+  tabText: {
+    fontSize: 14,
+    color: "#888",
+  },
+  activeTabText: {
+    color: "#4CD964",
+    fontWeight: "600",
+  },
+  tabContent: {
+    minHeight: 150,
+  },
+  descriptionText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#444",
+  },
+  reviewsContainer: {
+    marginTop: 8,
+  },
+  reviewItem: {
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    marginBottom: 8,
+  },
+  reviewerAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  reviewerInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  reviewerName: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  starsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  ratingText: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginLeft: 6,
+    color: "#FFD700",
+  },
+  reviewText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#444",
+  },
+  soldContainer: {
+    padding: 16,
+    backgroundColor: "#F8F8F8",
+    borderRadius: 8,
+  },
+  soldText: {
+    fontSize: 14,
+    color: "#444",
+  },
+  buyButtonContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFF",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#F0F0F0",
+    paddingBottom: Platform.OS === "ios" ? 30 : 12,
+  },
+  checkboxContainer: {
+    marginRight: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: "#4CD964",
+    borderColor: "#4CD964",
+  },
+  buyButton: {
+    flex: 1,
+    backgroundColor: "#4CD964",
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buyButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});
 
 export default DetailsScreen;

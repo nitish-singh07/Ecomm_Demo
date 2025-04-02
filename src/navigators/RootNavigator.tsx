@@ -6,6 +6,7 @@ import {
 } from "@react-navigation/native-stack";
 import DetailsScreen from "../screens/DetailsScreen";
 import TabsNavigator, { TabsStackParamList } from "./TabsNavigator";
+import { Ionicons } from "@expo/vector-icons";
 
 export type RootStackParamList = {
   TabsStack: NavigatorScreenParams<TabsStackParamList>;
@@ -33,7 +34,11 @@ const RootNavigator = () => {
         name="Details"
         component={DetailsScreen}
         options={{
-          headerShown: false,
+          headerTitleAlign: "center",
+          headerBlurEffect: "dark",
+          headerRight: () => (
+            <Ionicons name="share-outline" size={24} color="#000" />
+          ),
         }}
       />
     </RootStack.Navigator>
