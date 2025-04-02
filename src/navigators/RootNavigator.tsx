@@ -35,7 +35,6 @@ const RootNavigator = () => {
         component={DetailsScreen}
         options={{
           headerTitleAlign: "center",
-          headerBlurEffect: "dark",
           headerRight: () => (
             <Ionicons name="share-outline" size={24} color="#000" />
           ),

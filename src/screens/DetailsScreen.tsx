@@ -185,7 +185,7 @@ const DetailsScreen: React.FC = () => {
           <BlurView intensity={60} style={styles.blurBackground} tint="light" />
           <Animated.Image
             source={{
-              uri: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1036&q=80",
+              uri: "https://images.unsplash.com/photo-1571945153237-4929e783af4a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
             }}
             style={[
               styles.productImage,
@@ -197,12 +197,12 @@ const DetailsScreen: React.FC = () => {
             resizeMode="contain"
           />
 
-          {/* Image Pagination Dots */}
+          {/* Image Pagination Dots
           <View style={styles.paginationDots}>
             <View style={styles.activeDot} />
             <View style={styles.dot} />
             <View style={styles.dot} />
-          </View>
+          </View> */}
         </View>
 
         {/* Product Info */}
@@ -260,6 +260,7 @@ const DetailsScreen: React.FC = () => {
                   <View key={review.id} style={styles.reviewItem}>
                     <View style={styles.reviewHeader}>
                       <Image
+                        resizeMode="cover"
                         source={{ uri: review.avatar }}
                         style={styles.reviewerAvatar}
                       />
@@ -295,17 +296,16 @@ const DetailsScreen: React.FC = () => {
           },
         ]}
       >
+        <TouchableOpacity style={styles.buyButton}>
+          <Text style={styles.buyButtonText}>Buy Now</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.checkboxContainer}
           onPress={() => setIsChecked(!isChecked)}
         >
-          <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-            {isChecked && <Ionicons name="checkmark" size={16} color="#FFF" />}
+          <View style={{}}>
+            <Ionicons name="cart" size={30} color="#000" />
           </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.buyButton}>
-          <Text style={styles.buyButtonText}>Buy Now</Text>
         </TouchableOpacity>
       </Animated.View>
     </SafeAreaView>
@@ -315,7 +315,6 @@ const DetailsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     backgroundColor: "#F8F8F8",
   },
   header: {
@@ -354,7 +353,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   productImage: {
-    width: "80%",
+    width: "100%",
     height: "80%",
   },
   paginationDots: {
@@ -389,7 +388,7 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "centerborderR",
     marginBottom: 8,
   },
   productTitle: {
@@ -405,9 +404,13 @@ const styles = StyleSheet.create({
   },
   sizeContainer: {
     marginVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 15,
   },
   sizeLabel: {
-    fontSize: 16,
+    paddingTop: 10,
+    fontSize: 20,
     fontWeight: "600",
     marginBottom: 12,
   },
@@ -426,7 +429,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   selectedSizeOption: {
-    backgroundColor: "#4CD964",
+    backgroundColor: "black",
     borderColor: "#4CD964",
   },
   sizeText: {
@@ -521,6 +524,7 @@ const styles = StyleSheet.create({
   buyButtonContainer: {
     position: "absolute",
     bottom: 0,
+    columnGap: 10,
     left: 0,
     right: 0,
     backgroundColor: "#FFF",
@@ -551,7 +555,7 @@ const styles = StyleSheet.create({
   buyButton: {
     flex: 1,
     backgroundColor: "#4CD964",
-    borderRadius: 8,
+    borderRadius: 20,
     paddingVertical: 12,
     alignItems: "center",
     justifyContent: "center",
