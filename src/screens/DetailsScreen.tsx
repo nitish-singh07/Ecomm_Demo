@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "centerborderR",
+
     marginBottom: 8,
   },
   productTitle: {
