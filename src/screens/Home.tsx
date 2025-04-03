@@ -3,13 +3,32 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
+  // SafeAreaView,
+  TextInput,
   ScrollView,
   Image,
   TouchableOpacity,
+  Dimensions,
+  StatusBar,
 } from "react-native";
+
 import { Search, Bell, Heart } from "react-native-feather";
 import { NavigationProp } from "@react-navigation/native";
+import Carousel from "../components/Carousel";
+const SCREEN_WIDTH = Dimensions.get("window").width;
+import Icons from "@expo/vector-icons/MaterialIcons";
+import { useFont } from "../context/fontProvider";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+
+const AVATAR_URL =
+  "https://images.unsplash.com/photo-1496345875659-11f7dd282d1d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80";
+
+const image1 = require("../assets/images/image-1.jpg");
+const image2 = require("../assets/images/image-2.jpg");
+const image3 = require("../assets/images/image-3.jpg");
+const image4 = require("../assets/images/image-4.jpg");
+const image5 = require("../assets/images/image-5.jpg");
+const image6 = require("../assets/images/image-6.jpg");
 
 interface Product {
   id: string;
@@ -31,8 +50,7 @@ const PRODUCTS: Product[] = [
     id: "1",
     name: "Wake - Hoodie",
     price: 129,
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20250330-WA0003.jpg-jTdmKoLYuHq00IZNq1dXuR3j2Ig2rP.jpeg",
+    image: image1,
     brand: "Wake Officials",
     isFavorite: false,
   },
@@ -40,8 +58,39 @@ const PRODUCTS: Product[] = [
     id: "2",
     name: "Wake - Hoodie",
     price: 129,
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20250330-WA0003.jpg-jTdmKoLYuHq00IZNq1dXuR3j2Ig2rP.jpeg",
+    image: image2,
+    brand: "Wake Officials",
+    isFavorite: false,
+  },
+  {
+    id: "3",
+    name: "Wake - Hoodie",
+    price: 129,
+    image: image3,
+    brand: "Wake Officials",
+    isFavorite: false,
+  },
+  {
+    id: "4",
+    name: "Wake - Hoodie",
+    price: 129,
+    image: image4,
+    brand: "Wake Officials",
+    isFavorite: false,
+  },
+  {
+    id: "5",
+    name: "Wake - Hoodie",
+    price: 129,
+    image: image5,
+    brand: "Wake Officials",
+    isFavorite: false,
+  },
+  {
+    id: "6",
+    name: "Wake - Hoodie",
+    price: 129,
+    image: image5,
     brand: "Wake Officials",
     isFavorite: false,
   },
@@ -49,32 +98,147 @@ const PRODUCTS: Product[] = [
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("Popular");
+  const { fontsLoaded } = useFont();
+
+  if (!fontsLoaded) {
+    return <Text>Loading Fonts...</Text>;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.userInfo}>
-            <Image
-              source={{
-                uri: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20250330-WA0003.jpg-jTdmKoLYuHq00IZNq1dXuR3j2Ig2rP.jpeg",
+      {/* Header */}
+      <StatusBar backgroundColor="#161616" barStyle="light-content" />
+
+      <View
+        style={{
+          top: 0,
+          left: 0,
+          backgroundColor: "#161616",
+          paddingTop: 15,
+          paddingBottom: 15,
+          position: "relative",
+          width: "100%",
+          elevation: 4,
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+          zIndex: 1,
+        }}
+      >
+        <View
+          style={{
+            paddingHorizontal: 24,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            paddingBottom: 20,
+            backgroundColor: "#161616",
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+          }}
+        >
+          <Image
+            source={{
+              uri: AVATAR_URL,
+            }}
+            style={{ width: 52, aspectRatio: 1, borderRadius: 52 }}
+            resizeMode="cover"
+          />
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 18,
+                color: "white",
+                fontFamily: "ank",
+                marginBottom: 3,
               }}
-              style={styles.avatar}
+              numberOfLines={1}
+            >
+              Hi, James 👋
+            </Text>
+            <Text
+              style={{
+                color: "white",
+
+                // color: colors.text,
+                opacity: 0.75,
+                fontFamily: "ptr",
+              }}
+              numberOfLines={1}
+            >
+              Discover fashion that suit your style
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={{
+              width: 52,
+              aspectRatio: 1,
+              backgroundColor: "#242424",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 52,
+              borderWidth: 1,
+              borderColor: "#fff",
+            }}
+          >
+            <Icons name="notifications" size={24} color={"#fff"} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ flexDirection: "row", gap: 12, paddingHorizontal: 20 }}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={{
+              flex: 1,
+              height: 50,
+              borderRadius: 52,
+              borderWidth: 1,
+              backgroundColor: "#242424",
+              borderColor: "white",
+              flexDirection: "row",
+
+              alignItems: "center",
+              paddingHorizontal: 16,
+            }}
+          >
+            <Icons
+              name="search"
+              size={20}
+              color="white"
+              style={{ opacity: 0.5 }}
             />
-            <View>
-              <Text style={styles.welcomeText}>Welcome Back</Text>
-              <Text style={styles.appName}>Jobby</Text>
-            </View>
-          </View>
-          <View style={styles.headerIcons}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Search stroke="#000" width={24} height={24} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Bell stroke="#000" width={24} height={24} />
-            </TouchableOpacity>
-          </View>
+            <TextInput
+              style={{
+                flex: 1,
+                fontSize: 16,
+
+                color: "white",
+                fontFamily: "ank",
+                paddingVertical: 0,
+
+                includeFontPadding: false,
+                textAlignVertical: "center",
+              }}
+              placeholder="Search"
+              placeholderTextColor="rgba(255,255,255,0.5)"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView
+        style={{
+          top: 0,
+          left: 0,
+          position: "relative",
+          zIndex: 2,
+
+          paddingVertical: 23,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View>
+          <Carousel />
         </View>
 
         {/* Categories */}
@@ -113,6 +277,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
+        {/* Popular Products  images girds*/}
         <View style={styles.productsGrid}>
           {PRODUCTS.map((product) => (
             <TouchableOpacity
@@ -122,7 +287,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             >
               <View style={styles.productImageContainer}>
                 <Image
-                  source={{ uri: product.image }}
+                  source={
+                    typeof product.image === "string"
+                      ? { uri: product.image }
+                      : product.image
+                  }
                   style={styles.productImage}
                 />
                 <TouchableOpacity style={styles.favoriteButton}>

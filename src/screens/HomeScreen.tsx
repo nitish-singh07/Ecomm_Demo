@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  Dimensions,
 } from "react-native";
 import React, { useCallback, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,6 +19,8 @@ import CustomBackdrop from "../components/CustomBackdrop";
 import FilterView from "../components/FilterView";
 import { TabsStackScreenProps } from "../navigators/TabsNavigator";
 import { useFont } from "../context/fontProvider"; // Import Font Context
+
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const CATEGORIES = [
   "Clothing",
