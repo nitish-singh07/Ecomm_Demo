@@ -17,6 +17,7 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import CustomBackdrop from "../components/CustomBackdrop";
 import FilterView from "../components/FilterView";
 import { TabsStackScreenProps } from "../navigators/TabsNavigator";
+import { useFont } from "../context/fontProvider"; // Import Font Context
 
 const CATEGORIES = [
   "Clothing",
@@ -64,6 +65,12 @@ const MESONARY_LIST_DATA = [
 ];
 
 const HomeScreen = ({ navigation }: TabsStackScreenProps<"Home">) => {
+  const { fontsLoaded } = useFont();
+
+  if (!fontsLoaded) {
+    return <Text>Loading Fonts...</Text>;
+  }
+
   const { colors } = useTheme();
   const [categoryIndex, setCategoryIndex] = useState(0);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -95,8 +102,9 @@ const HomeScreen = ({ navigation }: TabsStackScreenProps<"Home">) => {
             <Text
               style={{
                 fontSize: 18,
-                fontWeight: "600",
-                marginBottom: 8,
+                // fontWeight: "bold",
+                fontFamily: "ank",
+                marginBottom: 3,
                 color: colors.text,
               }}
               numberOfLines={1}
@@ -104,7 +112,11 @@ const HomeScreen = ({ navigation }: TabsStackScreenProps<"Home">) => {
               Hi, James 👋
             </Text>
             <Text
-              style={{ color: colors.text, opacity: 0.75 }}
+              style={{
+                color: colors.text,
+                opacity: 0.75,
+                fontFamily: "ptr",
+              }}
               numberOfLines={1}
             >
               Discover fashion that suit your style
@@ -152,13 +164,14 @@ const HomeScreen = ({ navigation }: TabsStackScreenProps<"Home">) => {
                 fontSize: 16,
                 color: colors.text,
                 opacity: 0.5,
+                fontFamily: "ank",
               }}
             >
               Search
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={openFilterModal}
             style={{
               width: 52,
@@ -170,7 +183,7 @@ const HomeScreen = ({ navigation }: TabsStackScreenProps<"Home">) => {
             }}
           >
             <Icons name="tune" size={24} color={colors.background} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Grid Collection View */}
@@ -185,12 +198,19 @@ const HomeScreen = ({ navigation }: TabsStackScreenProps<"Home">) => {
             }}
           >
             <Text
-              style={{ fontSize: 20, fontWeight: "700", color: colors.text }}
+              style={{
+                fontSize: 20,
+                // fontWeight: "700",
+                fontFamily: "ank",
+                color: colors.text,
+              }}
             >
               New Collections
             </Text>
             <TouchableOpacity>
-              <Text style={{ color: colors.primary }}>See All</Text>
+              <Text style={{ color: colors.primary, fontFamily: "ank" }}>
+                See All
+              </Text>
             </TouchableOpacity>
           </View>
           <View style={{ flexDirection: "row", height: 200, gap: 12 }}>
@@ -254,7 +274,8 @@ const HomeScreen = ({ navigation }: TabsStackScreenProps<"Home">) => {
                     color: isSelected ? colors.background : colors.text,
                     fontWeight: "600",
                     fontSize: 14,
-                    opacity: isSelected ? 1 : 0.5,
+                    opacity: isSelected ? 1 : 0.9,
+                    fontFamily: "ank",
                   }}
                 >
                   {item}

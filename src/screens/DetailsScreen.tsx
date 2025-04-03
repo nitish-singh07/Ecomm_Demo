@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { Ionicons, AntDesign, FontAwesome } from "@expo/vector-icons";
+import { useFont } from "../context/fontProvider"; // Import Font Context
 
 // Types
 type Size = "S" | "M" | "L" | "XXL";
@@ -30,6 +31,11 @@ interface Review {
 const { width } = Dimensions.get("window");
 
 const DetailsScreen: React.FC = () => {
+  const { fontsLoaded } = useFont();
+
+  if (!fontsLoaded) {
+    return <Text>Loading Fonts...</Text>;
+  }
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -181,28 +187,34 @@ const DetailsScreen: React.FC = () => {
         </View> */}
 
         {/* Product Image with Blur */}
-        <View style={styles.imageContainer}>
-          <BlurView intensity={60} style={styles.blurBackground} tint="light" />
+        <View
+          style={{
+            width: "100%",
+            height: 350,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#FFF",
+            overflow: "hidden",
+            borderRadius: 20,
+            paddingVertical: 20,
+          }}
+        >
+          {/* <BlurView intensity={60} style={{ ... }} tint="light" /> */}
+
           <Animated.Image
+            // source={require("../assets/images/image-1.jpg")}
             source={{
               uri: "https://images.unsplash.com/photo-1571945153237-4929e783af4a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
             }}
-            style={[
-              styles.productImage,
-              {
-                opacity: fadeAnim,
-                transform: [{ scale: scaleAnim }],
-              },
-            ]}
-            resizeMode="contain"
+            style={{
+              width: "90%", // Adjust based on your design
+              height: "100%", // Fill the container
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+              resizeMode: "cover",
+              borderRadius: 30,
+            }}
           />
-
-          {/* Image Pagination Dots
-          <View style={styles.paginationDots}>
-            <View style={styles.activeDot} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
-          </View> */}
         </View>
 
         {/* Product Info */}
@@ -241,8 +253,8 @@ const DetailsScreen: React.FC = () => {
           {/* Tabs */}
           <View style={styles.tabsContainer}>
             {renderTab("Descriptions")}
-            {renderTab("Reviews", 503)}
-            {renderTab("Sold", 559)}
+            {renderTab("Reviews", 300)}
+            {renderTab("Sold", 900)}
           </View>
 
           {/* Tab Content */}
@@ -250,7 +262,15 @@ const DetailsScreen: React.FC = () => {
             {activeTab === "Descriptions" && (
               <Text style={styles.descriptionText}>
                 Premium quality jacket made with durable materials. Perfect for
-                casual and formal occasions.
+                casual and formal occasions.Experience the perfect blend of
+                style, comfort, and durability with our premium-quality jacket.
+                Crafted from high-grade, long-lasting materials, this jacket
+                offers exceptional resilience while maintaining a sleek and
+                sophisticated look. Designed to complement both casual outings
+                and formal events, it seamlessly enhances your wardrobe with its
+                versatile appeal. Whether you're heading to a business meeting,
+                a casual get-together, or a night out, this jacket ensures you
+                look effortlessly stylish while staying comfortable.
               </Text>
             )}
 
@@ -338,12 +358,16 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   imageContainer: {
-    width: "100%",
+    display: "flex",
+    overflow: "hidden",
+    width: "80%",
     height: 350,
+    // alignContent: "center",
     position: "relative",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#FFF",
+    flexDirection: "column",
   },
   blurBackground: {
     position: "absolute",
@@ -354,7 +378,9 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: "80%",
+    height: "100%",
+    resizeMode: "contain",
+    borderRadius: 20,
   },
   paginationDots: {
     flexDirection: "row",
@@ -393,12 +419,14 @@ const styles = StyleSheet.create({
   },
   productTitle: {
     fontSize: 22,
-    fontWeight: "bold",
+    // fontWeight: "bold",
+    fontFamily: "ank",
     flex: 1,
   },
   price: {
+    fontFamily: "pts",
     fontSize: 20,
-    fontWeight: "700",
+    // fontWeight: "700",
     color: "#000",
     marginBottom: 16,
   },
@@ -409,10 +437,11 @@ const styles = StyleSheet.create({
     columnGap: 15,
   },
   sizeLabel: {
-    paddingTop: 10,
+    // paddingTop: 10,
     fontSize: 20,
     fontWeight: "600",
-    marginBottom: 12,
+    fontFamily: "ptsbold",
+    // marginBottom: 12,
   },
   sizeOptions: {
     flexDirection: "row",
@@ -430,18 +459,21 @@ const styles = StyleSheet.create({
   },
   selectedSizeOption: {
     backgroundColor: "black",
-    borderColor: "#4CD964",
+    borderColor: "black",
   },
   sizeText: {
     fontSize: 14,
     fontWeight: "500",
+    fontFamily: "ank",
   },
   selectedSizeText: {
     color: "#FFF",
   },
   tabsContainer: {
     flexDirection: "row",
+    justifyContent: "space-evenly",
     borderBottomWidth: 1,
+
     borderBottomColor: "#E0E0E0",
     marginBottom: 16,
   },
@@ -451,14 +483,15 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: "#4CD964",
+    borderBottomColor: "#000",
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 17,
     color: "#888",
+    fontFamily: "ptsbold",
   },
   activeTabText: {
-    color: "#4CD964",
+    color: "#000",
     fontWeight: "600",
   },
   tabContent: {
@@ -466,6 +499,8 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     fontSize: 14,
+    fontFamily: "ank",
+    opacity: 0.75,
     lineHeight: 22,
     color: "#444",
   },
@@ -511,6 +546,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     color: "#444",
+    fontFamily: "ank",
+    opacity: 0.75,
   },
   soldContainer: {
     padding: 16,
@@ -520,6 +557,8 @@ const styles = StyleSheet.create({
   soldText: {
     fontSize: 14,
     color: "#444",
+    fontFamily: "ank",
+    opacity: 0.75,
   },
   buyButtonContainer: {
     position: "absolute",
@@ -554,7 +593,7 @@ const styles = StyleSheet.create({
   },
   buyButton: {
     flex: 1,
-    backgroundColor: "#4CD964",
+    backgroundColor: "#000",
     borderRadius: 20,
     paddingVertical: 12,
     alignItems: "center",
@@ -564,6 +603,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 16,
     fontWeight: "600",
+    fontFamily: "ank",
   },
 });
 

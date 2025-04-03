@@ -12,8 +12,10 @@ import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { FontProvider, useFont } from "./src/context/fontProvider";
 
-export default function App() {
+// ✅ Fix: Ensure MainApp always calls hooks in the same order
+const MainApp: React.FC = () => {
   const colorScheme = useColorScheme();
 
   const theme: Theme = useMemo(
@@ -52,10 +54,39 @@ export default function App() {
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );
+};
+
+// ✅ Fix: Move font check outside of MainApp
+export default function App(): JSX.Element {
+  return (
+    <FontProvider>
+      <AppWithFont />
+    </FontProvider>
+  );
 }
+
+// ✅ Separate component to handle font loading check
+const AppWithFont: React.FC = () => {
+  const { fontsLoaded } = useFont();
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.center}>
+        <Text>Loading Fonts...</Text>
+      </View>
+    );
+  }
+
+  return <MainApp />;
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
