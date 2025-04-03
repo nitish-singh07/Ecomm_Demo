@@ -12,9 +12,10 @@ import {
   Platform,
   SafeAreaView,
 } from "react-native";
-import { BlurView } from "expo-blur";
+
 import { Ionicons, AntDesign, FontAwesome } from "@expo/vector-icons";
-import { useFont } from "../context/fontProvider"; // Import Font Context
+import { useFont } from "../context/fontProvider";
+import { useRoute } from "@react-navigation/native";
 
 // Types
 type Size = "S" | "M" | "L" | "XXL";
@@ -36,6 +37,10 @@ const DetailsScreen: React.FC = () => {
   if (!fontsLoaded) {
     return <Text>Loading Fonts...</Text>;
   }
+
+  const route = useRoute();
+  const { product } = route.params as { product: any };
+
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -202,10 +207,10 @@ const DetailsScreen: React.FC = () => {
           {/* <BlurView intensity={60} style={{ ... }} tint="light" /> */}
 
           <Animated.Image
-            // source={require("../assets/images/image-1.jpg")}
-            source={{
-              uri: "https://images.unsplash.com/photo-1571945153237-4929e783af4a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
-            }}
+            source={product.image}
+            // source={{
+            //   uri: "https://images.unsplash.com/photo-1571945153237-4929e783af4a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
+            // }}
             style={{
               width: "90%", // Adjust based on your design
               height: "100%", // Fill the container
@@ -228,7 +233,7 @@ const DetailsScreen: React.FC = () => {
           ]}
         >
           <View style={styles.titleRow}>
-            <Text style={styles.productTitle}>Retirement Thug Jacket</Text>
+            <Text style={styles.productTitle}>{product.name}</Text>
             <TouchableOpacity onPress={toggleFavorite}>
               <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
                 <AntDesign
@@ -240,7 +245,7 @@ const DetailsScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.price}>IDR 700,000</Text>
+          <Text style={styles.price}>${product.price}</Text>
 
           {/* Size Selection */}
           <View style={styles.sizeContainer}>

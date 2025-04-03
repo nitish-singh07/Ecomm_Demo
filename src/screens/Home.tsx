@@ -1,9 +1,9 @@
 import React, { useState } from "react";
+
 import {
   View,
   Text,
   StyleSheet,
-  // SafeAreaView,
   TextInput,
   ScrollView,
   Image,
@@ -12,7 +12,7 @@ import {
   StatusBar,
 } from "react-native";
 
-import { Search, Bell, Heart } from "react-native-feather";
+import { Heart } from "react-native-feather";
 import { NavigationProp } from "@react-navigation/native";
 import Carousel from "../components/Carousel";
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -20,8 +20,7 @@ import Icons from "@expo/vector-icons/MaterialIcons";
 import { useFont } from "../context/fontProvider";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-const AVATAR_URL =
-  "https://images.unsplash.com/photo-1496345875659-11f7dd282d1d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80";
+const profile = require("../assets/images/profile.jpg");
 
 const image1 = require("../assets/images/image-1.jpg");
 const image2 = require("../assets/images/image-2.jpg");
@@ -43,55 +42,62 @@ interface HomeScreenProps {
   navigation: NavigationProp<any>;
 }
 
-const CATEGORIES: string[] = ["Popular", "Jacket", "Shoes", "Pants"];
+const CATEGORIES: string[] = [
+  "Popular",
+  "Jacket",
+  "Shoes",
+  "Pants",
+  "Shirt",
+  "Jeans",
+];
 
 const PRODUCTS: Product[] = [
   {
     id: "1",
-    name: "Wake - Hoodie",
-    price: 129,
+    name: "Nova - Jacket",
+    price: 199,
     image: image1,
-    brand: "Wake Officials",
-    isFavorite: false,
+    brand: "Nova Outfits",
+    isFavorite: true,
   },
   {
     id: "2",
-    name: "Wake - Hoodie",
-    price: 129,
+    name: "Flux - Hoodie",
+    price: 139,
     image: image2,
-    brand: "Wake Officials",
+    brand: "Flux Apparel",
     isFavorite: false,
   },
   {
     id: "3",
-    name: "Wake - Hoodie",
-    price: 129,
+    name: "Echo - Sweater",
+    price: 149,
     image: image3,
-    brand: "Wake Officials",
+    brand: "Echo Threads",
     isFavorite: false,
   },
   {
     id: "4",
-    name: "Wake - Hoodie",
-    price: 129,
+    name: "Blaze - Hoodie",
+    price: 179,
     image: image4,
-    brand: "Wake Officials",
-    isFavorite: false,
+    brand: "Blaze Wear",
+    isFavorite: true,
   },
   {
     id: "5",
-    name: "Wake - Hoodie",
-    price: 129,
+    name: "Zeal - Jacket",
+    price: 189,
     image: image5,
-    brand: "Wake Officials",
-    isFavorite: false,
+    brand: "Zeal Designs",
+    isFavorite: true,
   },
   {
     id: "6",
-    name: "Wake - Hoodie",
-    price: 129,
-    image: image5,
-    brand: "Wake Officials",
+    name: "Aero - Hoodie",
+    price: 159,
+    image: image6,
+    brand: "Aero Styles",
     isFavorite: false,
   },
 ];
@@ -121,6 +127,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           elevation: 4,
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
           zIndex: 1,
+          borderBottomLeftRadius: 10,
+          borderBottomRightRadius: 10,
         }}
       >
         <View
@@ -136,9 +144,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           }}
         >
           <Image
-            source={{
-              uri: AVATAR_URL,
-            }}
+            source={profile}
             style={{ width: 52, aspectRatio: 1, borderRadius: 52 }}
             resizeMode="cover"
           />
@@ -283,7 +289,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             <TouchableOpacity
               key={product.id}
               style={styles.productCard}
-              onPress={() => navigation.navigate("ProductDetail", { product })}
+              onPress={() => navigation.navigate("Details", { product })}
             >
               <View style={styles.productImageContainer}>
                 <Image
@@ -343,7 +349,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F2F7",
   },
   selectedCategory: { backgroundColor: "#000" },
-  categoryText: { color: "#8E8E93", fontWeight: "500" },
+  categoryText: { color: "#8E8E93", fontWeight: "500", fontFamily: "ank" },
   selectedCategoryText: { color: "white" },
   productsHeader: {
     flexDirection: "row",
@@ -353,8 +359,8 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 16,
   },
-  productsTitle: { fontSize: 18, fontWeight: "bold" },
-  seeAllText: { color: "#007AFF", fontWeight: "500" },
+  productsTitle: { fontSize: 18, fontFamily: "tail" },
+  seeAllText: { color: "#007AFF", fontWeight: "500", fontFamily: "ank" },
   productsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -376,7 +382,12 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   productInfo: { marginTop: 8 },
-  priceText: { fontWeight: "bold", fontSize: 14 },
-  productName: { fontSize: 14, fontWeight: "600", marginBottom: 4 },
-  brandText: { fontSize: 12, color: "#8E8E93" },
+  priceText: { fontSize: 14, fontFamily: "ank" },
+  productName: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 4,
+    fontFamily: "ptsbold",
+  },
+  brandText: { fontSize: 12, color: "#8E8E93", fontFamily: "ank" },
 });
