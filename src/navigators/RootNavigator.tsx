@@ -7,22 +7,37 @@ import {
 import DetailsScreen from "../screens/DetailsScreen";
 import TabsNavigator, { TabsStackParamList } from "./TabsNavigator";
 import { Ionicons } from "@expo/vector-icons";
+import OnboardingScreen from "../screens/onBoarding";
 
+// Define the parameter list for the Root Stack
 export type RootStackParamList = {
+  OnboardingScreen: undefined;
   TabsStack: NavigatorScreenParams<TabsStackParamList>;
   Details: {
     id: string;
   };
 };
 
+// Create the navigator and screen props types
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
   NativeStackScreenProps<RootStackParamList, T>;
 
+// Define the stack navigator
 const RootNavigator = () => {
   return (
-    <RootStack.Navigator>
+    <RootStack.Navigator initialRouteName="OnboardingScreen">
+      {/* Initial screen: Onboarding */}
+      <RootStack.Screen
+        name="OnboardingScreen"
+        component={OnboardingScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+
+      {/* Tabs stack */}
       <RootStack.Screen
         name="TabsStack"
         component={TabsNavigator}
@@ -30,6 +45,8 @@ const RootNavigator = () => {
           headerShown: false,
         }}
       />
+
+      {/* Details screen */}
       <RootStack.Screen
         name="Details"
         component={DetailsScreen}
