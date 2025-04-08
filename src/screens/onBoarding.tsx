@@ -12,9 +12,9 @@ import {
   NativeScrollEvent,
 } from "react-native";
 import { RootStackScreenProps } from "../navigators/RootNavigator";
+import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
-const profile = require("../assets/images/profile.jpg");
 
 const image1 = require("../assets/images/image-1.jpg");
 const image2 = require("../assets/images/image-2.jpg");
@@ -22,13 +22,14 @@ const image3 = require("../assets/images/image-3.jpg");
 const image4 = require("../assets/images/image-4.jpg");
 const image5 = require("../assets/images/image-5.jpg");
 const image6 = require("../assets/images/image-6.jpg");
+const image7 = require("../assets/images/image-7.jpg");
 
 const onboardingData = [
   {
     id: "1",
     title: "MAKE IT\nFASHIONABLE",
     subtitle: "With new fashion style",
-    image: image1,
+    image: image6,
   },
   {
     id: "2",
@@ -40,14 +41,7 @@ const onboardingData = [
     id: "3",
     title: "NEW CLOTHS\nNEW PASSION",
     subtitle: "With new fashion style",
-    image: image3,
-  },
-  {
-    id: "4",
-    title: "THE NEXT\nLEVEL OF STYLE",
-
-    subtitle: "With new fashion trends",
-    image: image4,
+    image: image7,
   },
 ];
 
@@ -59,11 +53,9 @@ export default function OnboardingScreen({ navigation }: Props) {
 
   useEffect(() => {
     if (currentIndex === onboardingData.length - 1) {
-      // Navigate to main app after last screen
       const timer = setTimeout(() => {
         navigation.replace("TabsStack");
       }, 1000);
-
       return () => clearTimeout(timer);
     }
   }, [currentIndex]);
@@ -79,9 +71,10 @@ export default function OnboardingScreen({ navigation }: Props) {
       <View style={styles.rightImageContainer}>
         <Image source={item.image} style={styles.image} />
       </View>
+
       <View style={styles.leftImageContainer}>
         <Image source={item.image} style={styles.image} />
-        <View style={styles.grayscaleOverlay} />
+        <BlurView intensity={50} tint="dark" style={StyleSheet.absoluteFill} />
       </View>
 
       <View style={styles.contentContainer}>
@@ -115,7 +108,6 @@ export default function OnboardingScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-
       <FlatList
         ref={flatListRef}
         data={onboardingData}
@@ -160,10 +152,6 @@ const styles = StyleSheet.create({
     height,
     position: "absolute",
     resizeMode: "cover",
-  },
-  grayscaleOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   contentContainer: {
     flex: 1,
